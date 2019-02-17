@@ -4,8 +4,8 @@
 function defineSVG(){
 
    //SVG area  
-    var svgWidth = 900;
-    var svgHeight = 600;
+    var svgWidth = 920;
+    var svgHeight = 620;
 
     var margin = {
         top: 60,
@@ -15,8 +15,8 @@ function defineSVG(){
     };
 
     // Define dimensions of the chart area
-    var chartWidth = svgWidth - margin.left - margin.right;
-    var chartHeight = svgHeight - margin.top - margin.bottom;
+    chartWidth = svgWidth - margin.left - margin.right;
+    chartHeight = svgHeight - margin.top - margin.bottom;
 
     // Select body, append SVG area to it, and set its dimensions
     var svg = d3.select("#scatter")
@@ -28,65 +28,129 @@ function defineSVG(){
     var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+    console.log("Completed defineSVG");
     return chartGroup;
 };
 
 
 
 //create scatterplot
-function makeScatterPlot(xdata, ydata){
+function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
 
     console.log(xdata);
     console.log(ydata);
 
-     var xScale = d3.domain(xdata).range(xdata);
+    console.log("chart height: ", chrtHt);
+    console.log("Chart width: ", chrtWd);
 
-     var yScale = d3.domain(ydata).range(ydata);
+    
 
-     var scatterFig = d3.scatter()
-        .x(xdata)
-        .y(ydata);
+    //create tuples of x,y values to plot the data
+    var plotData = [];
+    for (var i = 0; i< xdata.length; i++){
+        plotData.push([xdata[i], ydata[i], abbr[i]]);
+    };
+    console.log("PlotData: ", plotData);
 
+    //debugger;
+
+
+     var xScale = d3.scaleLinear()
+                    .domain(d3.extent(xdata))
+                    .range([0, chrtWd]);
+
+     var yScale = d3.scaleLinear()
+                    .domain(d3.extent(ydata))
+                    .range([chrtHt, 0]);
+
+   
+
+     //create axex
+     var yAxis = d3.axisLeft(yScale);
+     var xAxis = d3.axisBottom(xScale).ticks(10);
+
+    //Set x to bottom of chart
+    chartGroup.append("g")
+        .attr("transform", `translate(0, ${chrtHt})`)
+        .call(xAxis);
+
+    //Set y to the left of chart (no shift needed for y axis to be on the left)
+    chartGroup.append("g")
+        //.attr("transform", `translate(${chrtWd}, 0)`)
+        .call(yAxis);
+
+
+    // append data to chartgroup
+    chartGroup.selectAll("#scatter")
+        .data(plotData)
+        .enter()
+        .append("circle")
+        .attr("class","scatterCircles")
+        .attr("cx", d => xScale(d[0]))
+        .attr("cy", d => yScale(d[1]))
+        .attr("r", 10)
+       // .attr("text", d => d[2])
+        .style("fill","lightskyblue")
         
+        // d => xTimeScale(d.date)
+        // function d(){return yScale(d[1])})
 
+
+
+        chartGroup.append("text")
+        // Position the text
+        // Center the text:
+        // (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
+        .attr("transform", `translate(${20}, ${chrtHt/2})`)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .text("Lacks HealthCare (%)");
+
+        chartGroup.append("text")
+        .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 40})`)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .text("In Poverty(%)");
 };
 
 
+var chartWidth = 0;
+var chartHeight = 0;
 
 
-
+//read the csv file
 d3.csv("assets/data/data.csv").then(function(censusData) {
     
 
-    //create arrays to hold the data
-    var id = censusData.map(data => data.id);
+    //create arrays to hold the data. cast numeric data into numeric values
+    var id = censusData.map(data => +data.id);
     var state = censusData.map(data => data.state);
     var abbr = censusData.map(data => data.abbr);
-    var poverty = censusData.map(data => data.poverty);
-    var povertyMoe = censusData.map(data => data.povertyMoe);
+    var poverty = censusData.map(data => +data.poverty);
+    var povertyMoe = censusData.map(data => +data.povertyMoe);
 
-    var age = censusData.map(data => data.age);
-    var ageMoe  = censusData.map(data => data.ageMoe);
-    var income = censusData.map(data => data.income);
-    var incomeMoe = censusData.map(data => data.incomeMoe);
-    var healthcare = censusData.map(data => data.healthcare);
-    var healthcareLow = censusData.map(data => data.healthcareLow);
+    var age = censusData.map(data => +data.age);
+    var ageMoe  = censusData.map(data => +data.ageMoe);
+    var income = censusData.map(data => +data.income);
+    var incomeMoe = censusData.map(data => +data.incomeMoe);
+    var healthcare = censusData.map(data => +data.healthcare);
+    var healthcareLow = censusData.map(data => +data.healthcareLow);
 
-    var healthcareHigh = censusData.map(data => data.healthcareHigh);
-    var obesity = censusData.map(data => data.obesity);
-    var obesityLow = censusData.map(data => data.obesityLow);
-    var obesityHigh = censusData.map(data => data.obesityHigh);
-    var smokes = censusData.map(data => data.smokes);
-    var smokesLow = censusData.map(data => data.smokesLow);
-    var smokesHigh = censusData.map(data => data.smokesHigh);
+    var healthcareHigh = censusData.map(data => +data.healthcareHigh);
+    var obesity = censusData.map(data => +data.obesity);
+    var obesityLow = censusData.map(data => +data.obesityLow);
+    var obesityHigh = censusData.map(data => +data.obesityHigh);
+    var smokes = censusData.map(data => +data.smokes);
+    var smokesLow = censusData.map(data => +data.smokesLow);
+    var smokesHigh = censusData.map(data => +data.smokesHigh);
 
    //console.log(state);
 
     //define SVG chart
-    defineSVG();
+    var chrtgrp = defineSVG();
 
-    //heathcare vs. poverty
-    makeScatterPlot(healthcare, poverty);
+    //poverty vs. heathcare
+    makeScatterPlot(poverty, healthcare, abbr, chrtgrp, chartHeight, chartWidth);
 
   });
     
