@@ -35,7 +35,7 @@ function defineSVG(){
 
 
 //create scatterplot
-function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
+function makeScatterPlot(xdata, ydata, abbr, chartGroup){
 
     console.log(xdata);
     console.log(ydata);
@@ -101,17 +101,24 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
         // Position the text
         // Center the text:
         // (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
-        .attr("transform", `translate(${20}, ${chrtHt/2})`)
+        .classed("AxisText", true)
+        .attr("transform", `translate(${-30}, ${chrtHt/2}) rotate(-90)`)
         .attr("text-anchor", "middle")
         .attr("font-size", "16px")
         .text("Lacks HealthCare (%)");
 
         chartGroup.append("text")
+        .classed("AxisText", true)
         .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 40})`)
         .attr("text-anchor", "middle")
         .attr("font-size", "16px")
         .text("In Poverty(%)");
 };
+
+
+
+
+
 
 
 var chartWidth = 0;
@@ -150,7 +157,7 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
     var chrtgrp = defineSVG();
 
     //poverty vs. heathcare
-    makeScatterPlot(poverty, healthcare, abbr, chrtgrp, chartHeight, chartWidth);
+    makeScatterPlot(poverty, healthcare, abbr, chrtgrp);
 
   });
     
