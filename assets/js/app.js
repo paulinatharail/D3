@@ -35,7 +35,7 @@ function defineSVG(){
 
 
 //create scatterplot
-function makeScatterPlot(xdata, ydata, abbr, chartGroup){
+function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
 
     console.log(xdata);
     console.log(ydata);
@@ -80,17 +80,35 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup){
         .call(yAxis);
 
 
-    // append data to chartgroup
-    chartGroup.selectAll("#scatter")
+    var gdots =  chartGroup.selectAll("#scatter")
         .data(plotData)
-        .enter()
-        .append("circle")
-        .attr("class","scatterCircles")
+        .enter().append('g');
+
+    gdots.append("circle")
+        .attr("class", "stateCircle")
+        .attr("r", 15)
         .attr("cx", d => xScale(d[0]))
         .attr("cy", d => yScale(d[1]))
-        .attr("r", 10)
-       // .attr("text", d => d[2])
-        .style("fill","lightskyblue")
+        .style("fill", "lightskyblue")
+        ;    
+
+    gdots.append("text").text(d => d[2])
+        .classed("stateText", true)
+        .attr("x", d => xScale(d[0])-4)
+        .attr("y", d => yScale(d[1])+2)
+        ;
+
+    // // append data to chartgroup
+    // chartGroup.selectAll("#scatter")
+    //     .data(plotData)
+    //     .enter()
+    //     .append("circle")
+    //     .attr("class","scatterCircles")
+    //     .attr("cx", d => xScale(d[0]))
+    //     .attr("cy", d => yScale(d[1]))
+    //     .attr("r", 10)
+    //    // .attr("text", d => d[2])
+    //     .style("fill","lightskyblue")
         
         // d => xTimeScale(d.date)
         // function d(){return yScale(d[1])})
@@ -157,7 +175,7 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
     var chrtgrp = defineSVG();
 
     //poverty vs. heathcare
-    makeScatterPlot(poverty, healthcare, abbr, chrtgrp);
+    makeScatterPlot(poverty, healthcare, abbr, chrtgrp, chartHeight, chartWidth);
 
   });
     
