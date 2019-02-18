@@ -42,21 +42,20 @@
 }
 
 .d3-tip {
-  padding: 6px;
-  font-size: 12px;
+  padding: 2px;
+  font-size: 8px;
   line-height: 1;
   line-height: 1.5em;
-  color: #fff;
+  color: rgb(5, 5, 5);
   text-align: center;
   text-transform: capitalize;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(196, 238, 238, 0.8);
   border-radius: 4px;
 }
 
 .AxisText{
   font-weight: bold;
 }
-
 
 /* Mobile Rules */
 @media screen and (max-width: 530px) {

@@ -1,6 +1,6 @@
 
 
-//set SVG area dimensions
+//set SVG and chart area dimensions
 function defineSVG(){
 
    //SVG area  
@@ -28,8 +28,7 @@ function defineSVG(){
     var chartGroup = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    console.log("Completed defineSVG");
-    return chartGroup;
+     return chartGroup;
 };
 
 
@@ -37,37 +36,32 @@ function defineSVG(){
 //create scatterplot
 function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
 
-    console.log(xdata);
-    console.log(ydata);
-
-    console.log("chart height: ", chrtHt);
-    console.log("Chart width: ", chrtWd);
-
-    
-
     //create tuples of x,y values to plot the data
     var plotData = [];
     for (var i = 0; i< xdata.length; i++){
         plotData.push([xdata[i], ydata[i], abbr[i]]);
     };
-    console.log("PlotData: ", plotData);
+ 
 
-    //debugger;
+    //=====================================================    
+    //scales 
+    //=====================================================
+    var xScale = d3.scaleLinear()
+                .domain(d3.extent(xdata))
+                .range([0, chrtWd]);
 
-
-     var xScale = d3.scaleLinear()
-                    .domain(d3.extent(xdata))
-                    .range([0, chrtWd]);
-
-     var yScale = d3.scaleLinear()
-                    .domain(d3.extent(ydata))
-                    .range([chrtHt, 0]);
+    var yScale = d3.scaleLinear()
+                .domain(d3.extent(ydata))
+                .range([chrtHt, -5]);
 
    
 
-     //create axex
-     var yAxis = d3.axisLeft(yScale);
-     var xAxis = d3.axisBottom(xScale).ticks(10);
+    //=====================================================
+    //create axes
+    //=====================================================
+    var yAxis = d3.axisLeft(yScale);
+    var xAxis = d3.axisBottom(xScale).ticks(10);
+  
 
     //Set x to bottom of chart
     chartGroup.append("g")
@@ -80,57 +74,93 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
         .call(yAxis);
 
 
+    //Y Axis
+    chartGroup.append("text")
+    // Position the text
+    // Center the text:
+    // (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
+    .classed("AxisText", true)
+    .attr("transform", `translate(${-30}, ${chrtHt/2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .text("Lacks HealthCare (%)");
+
+    //X axis
+    chartGroup.append("text")
+    .classed("AxisText", true)
+    .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 40})`)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .text("In Poverty(%)");
+
+
+    //======================================================================
+    //Create the variable to hold circles and text in the scatter plot
+    //======================================================================
+
     var gdots =  chartGroup.selectAll("#scatter")
         .data(plotData)
         .enter().append('g');
 
+    //create circles
     gdots.append("circle")
         .attr("class", "stateCircle")
         .attr("r", 15)
         .attr("cx", d => xScale(d[0]))
         .attr("cy", d => yScale(d[1]))
         .style("fill", "lightskyblue")
+        // .on('mouseover', tool_tip.show)
+        // .on('mouseout', tool_tip.hide)
         ;    
+        // node.on('mouseout', function() {
+        //     d3.select(".d3-tip")
+        //     .transition()
+        //       .delay(100)
+        //       .duration(600)
+        //       .style("opacity",0)
+        //       .style('pointer-events', 'none')
+        //     });
 
+
+    //create text to be displayed inside the circle
     gdots.append("text").text(d => d[2])
         .classed("stateText", true)
-        .attr("x", d => xScale(d[0])-4)
-        .attr("y", d => yScale(d[1])+2)
+        .attr("x", d => xScale(d[0]))
+        .attr("y", d => yScale(d[1]))
         ;
 
-    // // append data to chartgroup
-    // chartGroup.selectAll("#scatter")
-    //     .data(plotData)
-    //     .enter()
-    //     .append("circle")
-    //     .attr("class","scatterCircles")
-    //     .attr("cx", d => xScale(d[0]))
-    //     .attr("cy", d => yScale(d[1]))
-    //     .attr("r", 10)
-    //    // .attr("text", d => d[2])
-    //     .style("fill","lightskyblue")
-        
-        // d => xTimeScale(d.date)
-        // function d(){return yScale(d[1])})
 
 
 
-        chartGroup.append("text")
-        // Position the text
-        // Center the text:
-        // (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
-        .classed("AxisText", true)
-        .attr("transform", `translate(${-30}, ${chrtHt/2}) rotate(-90)`)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
-        .text("Lacks HealthCare (%)");
 
-        chartGroup.append("text")
-        .classed("AxisText", true)
-        .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 40})`)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
-        .text("In Poverty(%)");
+    //======================================================================
+    //Create the tooltip
+    //======================================================================
+
+   
+    //Step 1: Initialize the tooltip
+    var toolTip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([80, -60])
+        .html(function(d, i) {
+            return (`<strong>${plotData[i][2]}</strong><hr> Poverty: ${plotData[i][0]} <br> Healthcare: ${plotData[i][1]}`);
+    });
+
+    // Step 2: Create the tooltip in chartGroup.
+    chartGroup.call(toolTip);
+
+    // Step 3: Create "mouseover" event listener to display tooltip
+    gdots.on("mouseover", function(d, i) {
+        toolTip.show(d, i, this);
+    })
+    // Step 4: Create "mouseout" event listener to hide tooltip
+        .on("mouseout", function(d) {
+        toolTip.hide(d);
+        });
+    
+
+
+
 };
 
 
@@ -169,7 +199,7 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
     var smokesLow = censusData.map(data => +data.smokesLow);
     var smokesHigh = censusData.map(data => +data.smokesHigh);
 
-   //console.log(state);
+    
 
     //define SVG chart
     var chrtgrp = defineSVG();
@@ -179,9 +209,8 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
 
   });
     
-    // console.log(stateInfo.healthcare);
-    // console.log(censusData.state);
 
+  
 
     
 
