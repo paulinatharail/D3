@@ -34,12 +34,35 @@ function defineSVG(){
 
 
 //create scatterplot
-function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
+function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
+
+    console.log("Number of columns is ",  Object.keys(data).length);
+
+    // let count = 0;
+    // for (var c in data) {
+    //     count = count + 1;
+    // }
+    // console.log(count);// 2
+
+    console.log(data);
+
+
+
+
+    //unpack the data
+    var state = data.map(data => data.state);
+    var abbr = data.map(data => data.abbr);
+    var poverty = data.map(data => +data.poverty);
+    var healthcare = data.map(data => +data.healthcare);
+ 
+    var xdata = poverty;
+    var ydata = healthcare;
+
 
     //create tuples of x,y values to plot the data
     var plotData = [];
     for (var i = 0; i< xdata.length; i++){
-        plotData.push([xdata[i], ydata[i], abbr[i]]);
+        plotData.push([xdata[i], ydata[i], abbr[i], state[i]]);
     };
  
 
@@ -109,18 +132,7 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
         .attr("cx", d => xScale(d[0]))
         .attr("cy", d => yScale(d[1]))
         .style("fill", "lightskyblue")
-        // .on('mouseover', tool_tip.show)
-        // .on('mouseout', tool_tip.hide)
-        ;    
-        // node.on('mouseout', function() {
-        //     d3.select(".d3-tip")
-        //     .transition()
-        //       .delay(100)
-        //       .duration(600)
-        //       .style("opacity",0)
-        //       .style('pointer-events', 'none')
-        //     });
-
+        ;
 
     //create text to be displayed inside the circle
     gdots.append("text").text(d => d[2])
@@ -143,7 +155,7 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
         .attr("class", "d3-tip")
         .offset([80, -60])
         .html(function(d, i) {
-            return (`<strong>${plotData[i][2]}</strong><hr> Poverty: ${plotData[i][0]} <br> Healthcare: ${plotData[i][1]}`);
+            return (`<strong>${plotData[i][3]}</strong><br>Poverty: ${plotData[i][0]}% <br> Healthcare: ${plotData[i][1]}%`);
     });
 
     // Step 2: Create the tooltip in chartGroup.
@@ -159,8 +171,6 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
         });
     
 
-
-
 };
 
 
@@ -169,43 +179,21 @@ function makeScatterPlot(xdata, ydata, abbr, chartGroup, chrtHt, chrtWd){
 
 
 
+
+
+//Declare chart width and height
 var chartWidth = 0;
 var chartHeight = 0;
 
 
 //read the csv file
 d3.csv("assets/data/data.csv").then(function(censusData) {
-    
-
-    //create arrays to hold the data. cast numeric data into numeric values
-    var id = censusData.map(data => +data.id);
-    var state = censusData.map(data => data.state);
-    var abbr = censusData.map(data => data.abbr);
-    var poverty = censusData.map(data => +data.poverty);
-    var povertyMoe = censusData.map(data => +data.povertyMoe);
-
-    var age = censusData.map(data => +data.age);
-    var ageMoe  = censusData.map(data => +data.ageMoe);
-    var income = censusData.map(data => +data.income);
-    var incomeMoe = censusData.map(data => +data.incomeMoe);
-    var healthcare = censusData.map(data => +data.healthcare);
-    var healthcareLow = censusData.map(data => +data.healthcareLow);
-
-    var healthcareHigh = censusData.map(data => +data.healthcareHigh);
-    var obesity = censusData.map(data => +data.obesity);
-    var obesityLow = censusData.map(data => +data.obesityLow);
-    var obesityHigh = censusData.map(data => +data.obesityHigh);
-    var smokes = censusData.map(data => +data.smokes);
-    var smokesLow = censusData.map(data => +data.smokesLow);
-    var smokesHigh = censusData.map(data => +data.smokesHigh);
-
-    
-
+        
     //define SVG chart
     var chrtgrp = defineSVG();
 
     //poverty vs. heathcare
-    makeScatterPlot(poverty, healthcare, abbr, chrtgrp, chartHeight, chartWidth);
+    makeScatterPlot(censusData, chrtgrp, chartHeight, chartWidth);
 
   });
     

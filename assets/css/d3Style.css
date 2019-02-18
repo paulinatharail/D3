@@ -43,15 +43,28 @@
 
 .d3-tip {
   padding: 2px;
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1;
   line-height: 1.5em;
-  color: rgb(5, 5, 5);
+  color: rgb(255, 250, 250);
   text-align: center;
   text-transform: capitalize;
-  background: rgba(196, 238, 238, 0.8);
+  background: rgba(4, 4, 4, 0.934);
   border-radius: 4px;
 }
+
+/* Creates a small triangle extender for the tooltip */
+/* .d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(196, 238, 238, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+} */
 
 .AxisText{
   font-weight: bold;
