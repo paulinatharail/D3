@@ -4,14 +4,14 @@
 function defineSVG(){
 
    //SVG area  
-    var svgWidth = 920;
-    var svgHeight = 620;
+    var svgWidth = 820;
+    var svgHeight = 520;
 
     var margin = {
         top: 60,
         right: 60,
-        bottom: 60,
-        left: 60
+        bottom: 80,
+        left: 80
     };
 
     // Define dimensions of the chart area
@@ -34,37 +34,22 @@ function defineSVG(){
 
 
 //create scatterplot
-function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
-
-    console.log("Number of columns is ",  Object.keys(data).length);
-
-    // let count = 0;
-    // for (var c in data) {
-    //     count = count + 1;
-    // }
-    // console.log(count);// 2
-
-    console.log(data);
-
-
-
+function makeScatterPlot(data, xvble, yvble, chartGroup, chrtHt, chrtWd){
 
     //unpack the data
     var state = data.map(data => data.state);
-    var abbr = data.map(data => data.abbr);
-    var poverty = data.map(data => +data.poverty);
-    var healthcare = data.map(data => +data.healthcare);
- 
-    var xdata = poverty;
-    var ydata = healthcare;
+    var abbr = data.map(data => data.abbr);    
+    var xdata = data.map(data => +data[xvble]);
+    var ydata = data.map(data => +data[yvble]);
 
+    
 
     //create tuples of x,y values to plot the data
     var plotData = [];
     for (var i = 0; i< xdata.length; i++){
         plotData.push([xdata[i], ydata[i], abbr[i], state[i]]);
     };
- 
+
 
     //=====================================================    
     //scales 
@@ -75,27 +60,26 @@ function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
 
     var yScale = d3.scaleLinear()
                 .domain(d3.extent(ydata))
-                .range([chrtHt, -5]);
+                .range([chrtHt, 0]);
 
-   
-
+ 
     //=====================================================
     //create axes
     //=====================================================
-    var yAxis = d3.axisLeft(yScale);
+    var yAxis = d3.axisLeft(yScale).ticks(7);
     var xAxis = d3.axisBottom(xScale).ticks(10);
   
 
     //Set x to bottom of chart
     chartGroup.append("g")
-        .attr("transform", `translate(0, ${chrtHt})`)
+        .attr("transform", `translate(-20, ${chrtHt+30})`)
         .call(xAxis);
 
     //Set y to the left of chart (no shift needed for y axis to be on the left)
     chartGroup.append("g")
-        //.attr("transform", `translate(${chrtWd}, 0)`)
+        .attr("transform", `translate(-20, 30)`)
         .call(yAxis);
-
+        
 
     //Y Axis
     chartGroup.append("text")
@@ -103,7 +87,7 @@ function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
     // Center the text:
     // (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor)
     .classed("AxisText", true)
-    .attr("transform", `translate(${-30}, ${chrtHt/2}) rotate(-90)`)
+    .attr("transform", `translate(${-50}, ${chrtHt/2}) rotate(-90)`)
     .attr("text-anchor", "middle")
     .attr("font-size", "16px")
     .text("Lacks HealthCare (%)");
@@ -111,7 +95,7 @@ function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
     //X axis
     chartGroup.append("text")
     .classed("AxisText", true)
-    .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 40})`)
+    .attr("transform", `translate(${chrtWd / 2}, ${chrtHt + 70})`)
     .attr("text-anchor", "middle")
     .attr("font-size", "16px")
     .text("In Poverty(%)");
@@ -178,7 +162,7 @@ function makeScatterPlot(data, chartGroup, chrtHt, chrtWd){
 
 
 
-
+////program start here
 
 
 //Declare chart width and height
@@ -193,7 +177,7 @@ d3.csv("assets/data/data.csv").then(function(censusData) {
     var chrtgrp = defineSVG();
 
     //poverty vs. heathcare
-    makeScatterPlot(censusData, chrtgrp, chartHeight, chartWidth);
+    makeScatterPlot(censusData, "poverty", "healthcare", chrtgrp, chartHeight, chartWidth);
 
   });
     
