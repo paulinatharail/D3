@@ -42,13 +42,6 @@ function makeScatterPlot(data, xvble, yvble, chartGroup, chrtHt, chrtWd){
     var xdata = data.map(data => +data[xvble]);
     var ydata = data.map(data => +data[yvble]);
 
-    
-
-    //create tuples of x,y values to plot the data
-    var plotData = [];
-    for (var i = 0; i< xdata.length; i++){
-        plotData.push([xdata[i], ydata[i], abbr[i], state[i]]);
-    };
 
 
     //=====================================================    
@@ -106,23 +99,23 @@ function makeScatterPlot(data, xvble, yvble, chartGroup, chrtHt, chrtWd){
     //======================================================================
 
     var gdots =  chartGroup.selectAll("#scatter")
-        .data(plotData)
+        .data(data)
         .enter().append('g');
 
     //create circles
     gdots.append("circle")
         .attr("class", "stateCircle")
         .attr("r", 15)
-        .attr("cx", d => xScale(d[0]))
-        .attr("cy", d => yScale(d[1]))
+        .attr("cx", d => xScale(d[xvble]))
+        .attr("cy", d => yScale(d[yvble]))
         .style("fill", "lightskyblue")
         ;
 
     //create text to be displayed inside the circle
-    gdots.append("text").text(d => d[2])
+    gdots.append("text").text(d => d["abbr"])
         .classed("stateText", true)
-        .attr("x", d => xScale(d[0]))
-        .attr("y", d => yScale(d[1]))
+        .attr("x", d => xScale(d[xvble]))
+        .attr("y", d => yScale(d[yvble]))
         ;
 
 
@@ -139,7 +132,7 @@ function makeScatterPlot(data, xvble, yvble, chartGroup, chrtHt, chrtWd){
         .attr("class", "d3-tip")
         .offset([80, -60])
         .html(function(d, i) {
-            return (`<strong>${plotData[i][3]}</strong><br>Poverty: ${plotData[i][0]}% <br> Healthcare: ${plotData[i][1]}%`);
+            return (`<strong>${data[i]["state"]}</strong><br>Poverty: ${data[i][xvble]}% <br> Healthcare: ${data[i][yvble]}%`);
     });
 
     // Step 2: Create the tooltip in chartGroup.
